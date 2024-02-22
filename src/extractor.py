@@ -16,18 +16,43 @@ class DetailsExtractor:
         return doc
     
     def extract(self):
+        date = self.extract_date()
+        name = self.extract_name()
+        destination = self.extract_destination()
+
+        if date is None:
+            return {
+                "error": "Unable to extract date"
+            }
+        if name is None:
+            return {
+                "error": "Unable to extract name"
+            }
+        if destination is None:
+            return {
+                "error": "Unable to extract destination"
+            }
+        
+        if self.promo_code is None:
+            return {
+                "error" : "Unable to extract promo code"
+            }
+
         data = {
-            "date": self.extract_date(),
-            "name": self.extract_name(),
-            "destination": self.extract_destination(),
+            "date": date,
+            "name": name,
+            "destination": destination,
             "promo_code": self.promo_code,
         }
         return data
 
     def extract_promo_code(self):
-        promo_code = re.findall(r"\[(.*?)\]", self.string)[0]
-        text = re.findall(r"\](.*)", self.string)[0].strip()
-        return promo_code, text
+        try:
+            promo_code = re.findall(r"\[(.*?)\]", self.string)[0]
+            text = re.findall(r"\](.*)", self.string)[0].strip()
+            return promo_code, text
+        except:
+            return None, self.string
     
     def extract_name(self):
         doc = self.nlp_parser()
